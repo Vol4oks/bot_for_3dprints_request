@@ -85,11 +85,10 @@ async def set_comment(message: types.Message, state: FSMContext):
 async def set_save(message: types.Message, state: FSMContext):
     save = message.text
     if save.isdigit() and int(save) == 1:
-        await message.answer("Спасибо")
+        await message.answer("Заявка сохранена")
         await state.reset_state()
     elif save == COMMAND_EXIT:
         await message.answer(ANSWER_EXIT)
-        await message.answer("Спасибо")
         await state.reset_state()
     else:
         await message.answer(
