@@ -14,7 +14,7 @@ class User(TimeBasedModel):
     
     user_id = models.BigIntegerField(unique=True, default=1, verbose_name="ID Пользователя Телеграм")
     name = models.CharField(max_length=100,  verbose_name="Имя Пользователя")
-    username = models.CharField(max_length=100,  verbose_name="Username Телеграм")
+    username = models.CharField(unique=True, max_length=100,  verbose_name="Username Телеграм")
 
     def __str__(self):
         return f"№{self.id} ({self.user_id} - {self.name})"
@@ -45,6 +45,7 @@ class Request(TimeBasedModel):
     promptness = models.IntegerField(verbose_name="Степень срочности", )
     comment = models.CharField(verbose_name="Комментарий", max_length=500, null=True)
     readiness = models.IntegerField(verbose_name="Готовность", choices=READINESS)
+    path_to_file = models.CharField(unique=True, verbose_name="Путь до файла", max_length=100, null=True)
 
     def __str__(self):
         return f"№{self.id} - {self.name_product}({self.quantity})"
