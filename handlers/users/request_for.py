@@ -67,8 +67,7 @@ async def set_promptness(message: types.Message, state: FSMContext):
 async def set_file(message: types.Message, state: FSMContext):
     path_to_download = Path().joinpath("users_files", f"{message.from_user.id}")
     path_to_download.mkdir(parents=True, exist_ok=True)
-    path_to_download = path_to_download.joinpath(f"{datetime.datetime.now().strftime('%d_%m_%Y_%H_%M')}_{message.document.file_name}")
-    await message.document.download(destination=path_to_download)
+    path_to_download = await path_to_download.joinpath(f"{datetime.datetime.now().strftime('%d_%m_%Y_%H_%M')}_{message.document.file_name}")
     try:
         await message.document.download(destination=path_to_downloader)
         await message.answer(f"Документ был сохранен в путь: {path_to_download}")
@@ -83,7 +82,7 @@ async def set_file(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=srf3D.file_add, content_types=types.ContentType.TEXT)
-async def set_file(message: types.Message, state: FSMContext):
+async def no_set_file(message: types.Message, state: FSMContext):
     promptness= message.text
     if message.text == COMMAND_EXIT:
         await message.answer(ANSWER_EXIT)
