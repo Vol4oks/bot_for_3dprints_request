@@ -4,7 +4,10 @@ from aiogram.dispatcher.filters import Command
 
 from loader import dp
 from states import StepRequestFor_print3D as srf3D
+from utils.db_api.db_commands import add_request, select_user
+
 import datetime
+from pathlib import Path
 
 COMMAND_EXIT = "q"
 ANSWER_EXIT = "Заявка отменина"
@@ -12,27 +15,19 @@ ANSWER_EXIT = "Заявка отменина"
 @dp.message_handler(text="/new", state=None)
 async def new_request(message: types.Message):
     await message.answer(f"Введите `{COMMAND_EXIT}` для выхода")
-    await message.answer("Введите ваше имя")
-    await srf3D.name_user.set()
+    await message.answer("Введите название модели")
+    await srf3D.name_product.set()
 
-@dp.message_handler(state=srf3D.name_user)
-async def set_name_user(message: types.Message, state: FSMContext):
-    name_user = message.text
-    if message.text == COMMAND_EXIT:
-        await message.answer(ANSWER_EXIT)
-        await state.reset_state()
-    else:
-        await state.update_data(name_user=name_user)
-        await message.answer("Введите название модели")
-        await srf3D.name_product.set()
 
 @dp.message_handler(state=srf3D.name_product)
 async def set_name_product(message: types.Message, state: FSMContext):
     name_product = message.text
+    user = await select_user(message.from_user.id)
     if message.text == COMMAND_EXIT:
         await message.answer(ANSWER_EXIT)
         await state.reset_state()
     else:
+        await state.update_data(name_user=user)
         await state.update_data(name_product=name_product)
         await message.answer("Введите количество моделей")
         await srf3D.quantity_product.set()
@@ -67,10 +62,11 @@ async def set_promptness(message: types.Message, state: FSMContext):
 async def set_file(message: types.Message, state: FSMContext):
     path_to_download = Path().joinpath("users_files", f"{message.from_user.id}")
     path_to_download.mkdir(parents=True, exist_ok=True)
-    path_to_download = await path_to_download.joinpath(f"{datetime.datetime.now().strftime('%d_%m_%Y_%H_%M')}_{message.document.file_name}")
+    path_to_download = path_to_download.joinpath(f"{datetime.datetime.now().strftime('%d_%m_%Y_%H_%M')}_{message.document.file_name}")
     try:
-        await message.document.download(destination=path_to_downloader)
+        await message.document.download(destination=path_to_download)
         await message.answer(f"Документ был сохранен в путь: {path_to_download}")
+        await state.update_data(file_add=path_to_download)
         #await message.answer(f"Документ был сохранен")
         await message.answer("Введите комментарий, если нужно")
         await srf3D.comment.set()
@@ -102,7 +98,7 @@ async def set_comment(message: types.Message, state: FSMContext):
         f"Имя модели:\n\t {data.get('name_product')}\n\n"
         f"Количесто деталий:\n\t {data.get('quantity_product')}\n\n"
         f"Степень важности:\n\t {data.get('promptness')}\n\n"
-        f""
+        f"Документ:\n\t {data.get('file_add')}\n\n"
         f"Комментарий:\n\t {data.get('comment')}\n\n"
         #f"{data} \n"
         "1 - если хотите отправить заявку \n"
@@ -113,12 +109,25 @@ async def set_comment(message: types.Message, state: FSMContext):
 @dp.message_handler(state=srf3D.save)
 async def set_save(message: types.Message, state: FSMContext):
     save = message.text
+    data = await state.get_data()
     if save.isdigit() and int(save) == 1:
+        await add_request(
+            name_user = data.get('name_user'),
+            name_product = data.get('name_product'),
+            type_request = '3D',
+            quantity = data.get('quantity_product'),
+            promptness = data.get('promptness'),
+            comment = data.get('comment'),
+            path_to_file = data.get('file_add'),
+        )
         await message.answer("Заявка сохранена")
         await state.reset_state()
     elif save == COMMAND_EXIT:
+        Path(data.get('file_add')).unlink()
         await message.answer(ANSWER_EXIT)
         await state.reset_state()
+
+        
     else:
         await message.answer(
             "Не понял вас, попробуйте еще раз\n"

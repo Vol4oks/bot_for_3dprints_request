@@ -14,22 +14,41 @@ services:
       - botnet
     volumes:
       - ./postgresql:/var/lib/postgresql
+  tgbot:
+    container_name: bot
+    build:
+      context: .
+    command: python app.py
+    volumes:
+      - .:/src
+    networks:
+      - botnet
+    restart: always
+    env_file:
+      - ".env"
+    # Бот стартует после запуска базы
+    depends_on:
+      - db
+      - django
   
-  #tgbot:
-  #  container_name: bot
-  #  build:
-  #    context: .
-  #  command: python app.py
-  #  networks:
-  #    - botnet
-  #  restart: always
-  #  env_file:
-  #    - ".env"
-  #  volumes:
-  #    - .:/src
-  #  depends_on:
-  #    - db
+  django:
+    container_name: djangoproject
+    build:
+      context: .
+    command: python django_app.py runserver 0.0.0.0:8000 --noreload
+    ports:
+      - 8000:8000
+    networks:
+      - botnet
+    restart: always
 
+    volumes:
+      - .:/src
+    env_file:
+      - ".env"
+    # Бот стартует после запуска базы
+    depends_on:
+      - db
 
 networks:
   botnet:

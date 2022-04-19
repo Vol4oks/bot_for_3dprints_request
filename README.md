@@ -26,3 +26,15 @@
 # Используемые технологии 
 1) SQLAlchemy для работы с базой данных 
 2) Django для работе с админкой
+
+
+# docker commands
+sudo docker-compose build
+sudo docker-compose up
+ctrl + z
+sudo docker exec -it djangoproject bash
+python django_app.py migrate
+python django_app.py createsuperuser
+-[name]
+-[pass]
+exit 

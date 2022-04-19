@@ -138,3 +138,7 @@ dmypy.json
 .idea/modules.xml
 .idea/vagrant.xml
 .idea/vcs.xml
+
+#юзер документы 
+users_files/*
+postgresql/*

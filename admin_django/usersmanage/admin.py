@@ -11,3 +11,4 @@ class UserAdmin(admin.ModelAdmin):
 class RequestAdmine(admin.ModelAdmin):
     list_display = ("id", "name_user", "type_request", "quantity", "promptness",
                         "comment", "readiness", "path_to_file")
+ 
