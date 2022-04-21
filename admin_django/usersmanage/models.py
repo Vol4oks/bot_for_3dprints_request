@@ -17,7 +17,7 @@ class User(TimeBasedModel):
     username = models.CharField(unique=True, max_length=100,  verbose_name="Username Телеграм")
 
     def __str__(self):
-        return f"№{self.id} ({self.user_id} - {self.name})"
+        return f"{self.name} - {self.username}"
 
 
 class Request(TimeBasedModel):

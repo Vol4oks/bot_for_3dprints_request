@@ -18,7 +18,9 @@ def select_user(user_id: int):
 # Функция для добаления заявки
 @sync_to_async
 def add_request(**kwargs):
-    return Request(**kwargs).save()
+    res = Request(**kwargs)
+    res.save()
+    return res.id
 
 # Функция возвращает объект заявки по ее айди
 @sync_to_async

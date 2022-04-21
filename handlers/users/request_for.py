@@ -111,16 +111,18 @@ async def set_save(message: types.Message, state: FSMContext):
     save = message.text
     data = await state.get_data()
     if save.isdigit() and int(save) == 1:
-        await add_request(
-            name_user = data.get('name_user'),
-            name_product = data.get('name_product'),
-            type_request = '3D',
-            quantity = data.get('quantity_product'),
-            promptness = data.get('promptness'),
-            comment = data.get('comment'),
-            path_to_file = data.get('file_add'),
-        )
+        res = await add_request(
+                name_user = data.get('name_user'),
+                name_product = data.get('name_product'),
+                type_request = '3D',
+                quantity = data.get('quantity_product'),
+                promptness = data.get('promptness'),
+                comment = data.get('comment'),
+                path_to_file = data.get('file_add'), 
+            )
+        await message.answer(f"{res}")
         await message.answer("Заявка сохранена")
+        
         await state.reset_state()
     elif save == COMMAND_EXIT:
         Path(data.get('file_add')).unlink()
