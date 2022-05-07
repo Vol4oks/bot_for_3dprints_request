@@ -1,10 +1,11 @@
-version: '3.1'
+version: '3.2'
 
 services:
   db:
     container_name: database 
     image: postgres:13.3
     environment:
+      POSTGRES_USER: $PGUSER
       POSTGRES_PASSWORD: $PGPASSWORD
 
     restart: always
@@ -14,13 +15,20 @@ services:
       - botnet
     volumes:
       - ./postgresql:/var/lib/postgresql
+    
   tgbot:
     container_name: bot
     build:
       context: .
     command: python app.py
+
     volumes:
       - .:/src
+      - type: volume
+        source: users_files
+        target: /scr/users_files
+    ports:
+      - 8001:8001
     networks:
       - botnet
     restart: always
@@ -30,7 +38,8 @@ services:
     depends_on:
       - db
       - django
-  
+      
+ 
   django:
     container_name: djangoproject
     build:
@@ -44,12 +53,18 @@ services:
 
     volumes:
       - .:/src
+      - type: volume
+        source: users_files
+        target: /scr/users_files
+
     env_file:
       - ".env"
     # Бот стартует после запуска базы
     depends_on:
       - db
-
+volumes:
+  users_files:
+    external: true
 networks:
   botnet:
     driver: bridge 

@@ -24,17 +24,24 @@
 
 
 # Используемые технологии 
-1) SQLAlchemy для работы с базой данных 
-2) Django для работе с админкой
-
+1) Django для работе с админкой
+2) aiogram
+3) docker
 
 # docker commands
-sudo docker-compose build
-sudo docker-compose up
-ctrl + z
+sudo docker volume create --name=users_files
+sudo docker-compose up --build -d
 sudo docker exec -it djangoproject bash
 python django_app.py migrate
 python django_app.py createsuperuser
 -[name]
 -[pass]
 exit 
+
+# остановка 
+sudo docker-compose down -v
+
+# Планы по доработке 
+1)Обработка запроса при отправки картинки 
+2)Вывод списка отправленных заявок в работе
+3)Отправка сообщения при изменении заявки

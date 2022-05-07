@@ -9,7 +9,7 @@ PGPASSWORD = str(os.getenv("PGPASSWORD"))
 DATABASE = str(os.getenv("DATABASE"))
 DBHOST = str(os.getenv("DBHOST"))
 admins = [
-    340899114,
+    str(os.getenv("ADMINS")),
 ]
 
 ip = os.getenv("ip")
@@ -22,3 +22,4 @@ redis = {
     'address': (ip, 6379),
     'encoding': 'utf8'
 }
+POSTGRES_URI = f"postgresql://{PGUSER}:{PGPASSWORD}@{DBHOST}/{DATABASE}"
