@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils.safestring import mark_safe
 class TimeBasedModel(models.Model):
     class Meta:
         abstract = True
@@ -49,4 +49,9 @@ class Request(TimeBasedModel):
 
     def __str__(self):
         return f"№{self.id} - {self.name_product}({self.quantity})"
+    
+    def fieldname_download(self):
+        return mark_safe('<a href="/{0}" download>Скачать</a>'.format(
+            self.path_to_file, self.path_to_file))
 
+    fieldname_download.short_description = 'Скачать Файл'
