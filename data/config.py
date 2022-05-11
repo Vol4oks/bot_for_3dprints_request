@@ -9,7 +9,7 @@ PGPASSWORD = str(os.getenv("PGPASSWORD"))
 DATABASE = str(os.getenv("DATABASE"))
 DBHOST = str(os.getenv("DBHOST"))
 admins = [
-    str(os.getenv("ADMINS")),
+    int(os.getenv("ADMINS"))
 ]
 
 ip = os.getenv("ip")

@@ -10,7 +10,7 @@ import datetime
 from pathlib import Path
 
 COMMAND_EXIT = "q"
-ANSWER_EXIT = "Заявка отменина"
+ANSWER_EXIT = "Заявка отменена"
 
 @dp.message_handler(text="/new", state=None)
 async def new_request(message: types.Message):
@@ -29,7 +29,7 @@ async def set_name_product(message: types.Message, state: FSMContext):
     else:
         await state.update_data(name_user=user)
         await state.update_data(name_product=name_product)
-        await message.answer("Введите количество моделей")
+        await message.answer("Введите количество моделей, число.")
         await srf3D.quantity_product.set()
 
 @dp.message_handler(state=srf3D.quantity_product)
@@ -65,10 +65,11 @@ async def set_file(message: types.Message, state: FSMContext):
     path_to_download = path_to_download.joinpath(f"{datetime.datetime.now().strftime('%d_%m_%Y_%H_%M')}_{message.document.file_name}")
     try:
         await message.document.download(destination=path_to_download)
-        await message.answer(f"Документ был сохранен в путь: {path_to_download}")
+        #await message.answer(f"Документ был сохранен в путь: {path_to_download}")
         await state.update_data(file_add=path_to_download)
-        #await message.answer(f"Документ был сохранен")
-        await message.answer("Введите комментарий, если нужно")
+        await state.update_data(file_name=message.document.file_name)
+        await message.answer(f"Документ сохранен")
+        await message.answer("Введите комментарий.")
         await srf3D.comment.set()
     except Exception as ex:
         await message.answer("Документ не был сохранен")
@@ -77,9 +78,8 @@ async def set_file(message: types.Message, state: FSMContext):
         await message.answer(f"Введите `{COMMAND_EXIT}` для выхода")
 
 
-@dp.message_handler(state=srf3D.file_add, content_types=types.ContentType.TEXT)
+@dp.message_handler(state=srf3D.file_add, content_types=["text", "sticker", "pinned_message", "photo", "audio", "voice"])
 async def no_set_file(message: types.Message, state: FSMContext):
-    promptness= message.text
     if message.text == COMMAND_EXIT:
         await message.answer(ANSWER_EXIT)
         await state.reset_state()
@@ -98,7 +98,7 @@ async def set_comment(message: types.Message, state: FSMContext):
         f"Имя модели:\n\t {data.get('name_product')}\n\n"
         f"Количесто деталий:\n\t {data.get('quantity_product')}\n\n"
         f"Степень важности:\n\t {data.get('promptness')}\n\n"
-        f"Документ:\n\t {data.get('file_add')}\n\n"
+        f"Документ:\n\t {data.get('file_name')}\n\n"
         f"Комментарий:\n\t {data.get('comment')}\n\n"
         #f"{data} \n"
         "1 - если хотите отправить заявку \n"
@@ -120,8 +120,9 @@ async def set_save(message: types.Message, state: FSMContext):
                 comment = data.get('comment'),
                 path_to_file = data.get('file_add'), 
             )
-        await message.answer(f"{res}")
         await message.answer("Заявка сохранена")
+        await message.answer(f"Номер вашей заявки: {res}")
+        
         
         await state.reset_state()
     elif save == COMMAND_EXIT:

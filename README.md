@@ -39,6 +39,9 @@ python django_app.py createsuperuser
 exit 
 
 # остановка 
+sudo docker-compose stop
+
+# остановить с удоление локальных файлов 
 sudo docker-compose down -v
 
 # Планы по доработке 

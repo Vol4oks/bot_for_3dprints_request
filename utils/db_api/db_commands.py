@@ -11,7 +11,7 @@ def add_user(user_id, full_name, username):
 def select_all_users():
     return User.objects.all()
 
-@sync_to_async
+@sync_to_async 
 def select_user(user_id: int):
     return User.objects.filter(user_id=user_id).first()
 
@@ -21,6 +21,12 @@ def add_request(**kwargs):
     res = Request(**kwargs)
     res.save()
     return res.id
+
+# Функция возвращает список активных заявок
+@sync_to_async
+def get_requests(user_id: int):
+    ans = Request.objects.filter(name_user=int(user_id)).all()[:5:-1]
+    return ans
 
 # Функция возвращает объект заявки по ее айди
 @sync_to_async
